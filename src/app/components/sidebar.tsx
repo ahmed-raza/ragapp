@@ -16,7 +16,7 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-white shadow-md flex flex-col p-4">
-      <div className="text-2xl font-bold mb-8">🚀 MyApp</div>
+      <div className="text-2xl font-bold mb-8">🚀 {process.env.NEXT_PUBLIC_APP_NAME}</div>
 
       <nav className="flex flex-col gap-2">
         {navLinks.map((link) => (
@@ -42,7 +42,7 @@ export default function Sidebar() {
         >
           🚪 Logout
         </Link>
-        <div className="text-xs text-gray-500">&copy; 2025 MyApp</div>
+        <div className="text-xs text-gray-500">&copy; 2025 {process.env.NEXT_PUBLIC_APP_NAME}</div>
       </div>
     </aside>
   );

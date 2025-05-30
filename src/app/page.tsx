@@ -37,8 +37,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-2xl h-[70vh] bg-white rounded-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4">
+    <main className="flex flex-col items-center justify-center px-4">
+      <div className="w-full max-w-2xl h-[80vh] bg-white rounded-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4">
         {messages.map((msg, idx) => (
           <div
             key={idx}

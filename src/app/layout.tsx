@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
+import Sidebar from "./components/sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,27 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 min-h-screen text-gray-900 flex`}
       >
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-md flex flex-col p-4">
-          <div className="text-2xl font-bold mb-8">🚀 {process.env.APP_NAME}</div>
-          <nav className="flex flex-col gap-4">
-            <Link href="/" className="hover:text-blue-600">🏠 Dashboard</Link>
-            <Link href="/chat" className="hover:text-blue-600">💬 Chat</Link>
-            <Link href="/documents" className="hover:text-blue-600">📄 Documents</Link>
-            <Link href="/settings" className="hover:text-blue-600">⚙️ Settings</Link>
-          </nav>
-          {/* Push logout link to bottom */}
-          <div className="mt-auto flex flex-col gap-4 border-t pt-6">
-            <Link
-              href="/api/auth/signout"
-              className="text-red-600 hover:text-red-700"
-            >
-              🚪 Logout
-            </Link>
-            <div className="text-xs text-gray-500">&copy; 2025 {process.env.APP_NAME}</div>
-          </div>
-        </aside>
-        {/* Main content */}
+        <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto">{children}</main>
       </body>
     </html>

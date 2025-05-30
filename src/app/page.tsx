@@ -27,14 +27,13 @@ export default function Home() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || !socket.current?.readyState) return;
 
-    setMessages([...messages, { sender: "user", text: input }]);
+    socket.current.send(input);
+    setMessages((prev) => [...prev, `You: ${input}`]);
     setInput("");
-    console.log(messages)
-    // You can add AI response here
   };
 
   return (
@@ -44,30 +43,27 @@ export default function Home() {
           <div
             key={idx}
             className={`max-w-[75%] px-4 py-2 rounded-lg ${
-              msg.sender === "user"
+              msg.startsWith("You:")
                 ? "self-end bg-blue-500 text-white"
                 : "self-start bg-gray-200 text-gray-800"
             }`}
           >
-            {msg.text}
+            {msg}
           </div>
         ))}
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-2xl flex items-center gap-2"
-      >
+      <form onSubmit={sendMessage} className="w-full max-w-2xl flex gap-2">
         <textarea
           rows={2}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
-          className="flex-1 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 p-3 border rounded-md resize-none"
+          placeholder="Type a message"
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
         >
           Send
         </button>

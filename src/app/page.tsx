@@ -58,8 +58,14 @@ export default function Home() {
           rows={2}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 p-3 border rounded-md resize-none"
-          placeholder="Type a message"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage(e);
+            }
+          }}
+          className="flex-1 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Type your message"
         />
         <button
           type="submit"

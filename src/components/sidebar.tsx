@@ -2,9 +2,9 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import LogoutButton from "./LogoutButton";
+import { useState, useEffect } from "react";
 
 const navLinks = [
   { href: "/dashboard", label: "🏠 Dashboard" },
@@ -14,7 +14,11 @@ const navLinks = [
 ];
 
 export default function Sidebar() {
-  const pathname = usePathname();
+  const [currentPath, setCurrentPath] = useState('');
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
 
   return (
     <aside className="w-64 bg-gray-800 text-white p-4 flex flex-col justify-between h-screen">
@@ -29,7 +33,7 @@ export default function Sidebar() {
               href={link.href}
               className={clsx(
                 "px-3 py-2 rounded hover:bg-blue-50 hover:text-gray-800 transition-colors",
-                pathname === link.href
+                currentPath === link.href
                   ? "bg-blue-100 text-gray-800 font-semibold"
                   : "text-gray-300"
               )}

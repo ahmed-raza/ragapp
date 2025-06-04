@@ -1,24 +1,19 @@
-// src/components/Sidebar.tsx
 'use client';
 
-import Link from "next/link";
-import clsx from "clsx";
-import LogoutButton from "./LogoutButton";
-import { useState, useEffect } from "react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import clsx from 'clsx';
+import LogoutButton from './LogoutButton';
 
 const navLinks = [
-  { href: "/dashboard", label: "🏠 Dashboard" },
-  { href: "/chat", label: "💬 Chat" },
-  { href: "/documents", label: "📄 Documents" },
-  { href: "/settings", label: "⚙️ Settings" },
+  { href: '/dashboard', label: '🏠 Dashboard' },
+  { href: '/chat', label: '💬 Chat' },
+  { href: '/documents', label: '📄 Documents' },
+  { href: '/settings', label: '⚙️ Settings' },
 ];
 
 export default function Sidebar() {
-  const [currentPath, setCurrentPath] = useState('');
-
-  useEffect(() => {
-    setCurrentPath(window.location.pathname);
-  }, []);
+  const pathname = usePathname();
 
   return (
     <aside className="w-64 bg-gray-800 text-white p-4 flex flex-col justify-between h-screen">
@@ -32,10 +27,10 @@ export default function Sidebar() {
               key={link.href}
               href={link.href}
               className={clsx(
-                "px-3 py-2 rounded hover:bg-blue-50 hover:text-gray-800 transition-colors",
-                currentPath === link.href
-                  ? "bg-blue-100 text-gray-800 font-semibold"
-                  : "text-gray-300"
+                'px-3 py-2 rounded hover:bg-blue-50 hover:text-gray-800 transition-colors',
+                pathname === link.href
+                  ? 'bg-blue-100 text-gray-800 font-semibold'
+                  : 'text-gray-300'
               )}
             >
               {link.label}

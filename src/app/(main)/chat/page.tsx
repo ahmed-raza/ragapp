@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 
-export default function Home() {
+export default function Chat() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const socket = useRef<WebSocket | null>(null);

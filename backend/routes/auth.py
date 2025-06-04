@@ -39,8 +39,3 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token = create_access_token(data={"sub": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.get("/protected", response_model=UserResponse)
-def protected_route(current_user: User = Depends(get_current_user)):
-    return current_user

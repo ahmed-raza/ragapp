@@ -1,4 +1,5 @@
 from .state import AgentState
+from .tools import get_llm
 
 def process_message_node(state: AgentState) -> AgentState:
     """
@@ -9,9 +10,10 @@ def process_message_node(state: AgentState) -> AgentState:
     messages = state["messages"]
     latest_message = messages[-1] if messages else "No message"
 
-    # In a real scenario, you'd likely use an LLM here to process the message.
-    # For demonstration, let's just append a processing confirmation.
-    #processed_message = f"Processed: '{latest_message}'"
-    new_messages = messages + [latest_message]
+    llm = get_llm(temperature=0.5)
 
-    return {"messages": new_messages}
+    response = llm.invoke(messages)
+
+    state["messages"] = state["messages"] + [response]
+
+    return state

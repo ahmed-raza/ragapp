@@ -1,4 +1,4 @@
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, AIMessage
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from routes import routes
@@ -53,12 +53,21 @@ async def websocket_endpoint(websocket: WebSocket):
                     "checkpoint_id": cid,
                 }
             }
-            response = await rag_app.ainvoke({"messages": [human_message]}, config=config)
-            print(response)
+            state = {"messages": [human_message]}
+            ai_messages = []
+            response = await rag_app.ainvoke(state, config=config)
 
-            # for word in words:
-            #     await websocket.send_text(word)
-            #     await asyncio.sleep(0.08)
+            for message in response.get("messages"):
+                if isinstance(message, AIMessage) and message.response_metadata["finish_reason"] == "stop":
+                    ai_messages.append(message)
+
+            last_two_ai = ai_messages[-1:]
+            word_lists = [msg.content.split() for msg in last_two_ai]
+            all_words = [word for word_list in word_lists for word in word_list]
+
+            for word in all_words:
+                await websocket.send_text(word + " ")
+                await asyncio.sleep(0.08)
     except WebSocketDisconnect as e:
         print(f"Client disconnected {e}")
     except Exception as e:

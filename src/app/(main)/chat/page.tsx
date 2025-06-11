@@ -9,6 +9,8 @@ export default function Chat() {
   const [isConnected, setIsConnected] = useState(false);
   const streamBufferRef = useRef(""); // holds accumulating message
   const chatContainerRef = useRef<HTMLDivElement | null>(null); // for scrolling
+  const [isTyping, setIsTyping] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   // Scrolls to bottom
   const scrollToBottom = () => {
@@ -31,12 +33,10 @@ export default function Chat() {
 
     socket.current.onmessage = (event) => {
       const msg = event.data;
-
+      setIsTyping(true);
+      setProcessing(false);
       if (msg === "[end]") {
-        setMessages((prev) => [
-          ...prev.slice(0, -1),
-          `Bot: ${streamBufferRef.current.trim()}`,
-        ]);
+        setIsTyping(false);
         streamBufferRef.current = "";
       } else {
         streamBufferRef.current += " " + msg;
@@ -74,19 +74,35 @@ export default function Chat() {
     socket.current.send(input);
     setMessages((prev) => [...prev, `You: ${input}`]);
     setInput("");
+    setProcessing(true);
   };
 
   return (
     <main className="flex flex-col items-center justify-center px-4">
-      {isConnected ? (
-        <span className="flex w-3 h-3 me-3 bg-green-500 rounded-full"></span>
-      ) : (
-        <span className="flex w-3 h-3 me-3 bg-gray-200 rounded-full"></span>
-      )}
+      <div className="w-full max-w-2xl mt-4 flex items-center gap-4 bg-white rounded-t-xl shadow px-4 py-3 border-b border-gray-200">
+        <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+          🤖
+        </div>
+        <div className="flex flex-col">
+          <span className="font-semibold text-lg text-gray-800">AI Assistant</span>
+          <div className="flex items-center gap-1">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-gray-400"
+              }`}
+            />
+            <span className="text-sm text-gray-500">
+              {isConnected ? "Online" : "Offline"}
+              {isTyping && (<> • <span className="animate-pulse">Bot is typing...</span></>)}
+              {processing && (<> • <span className="animate-pulse">Processing...</span></>)}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <div
         ref={chatContainerRef}
-        className="w-full mt-8 max-w-2xl h-[80vh] bg-white rounded-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4"
+        className="w-full max-w-2xl h-[77vh] bg-white rounded-b-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4"
       >
         {messages.map((msg, idx) => (
           <div

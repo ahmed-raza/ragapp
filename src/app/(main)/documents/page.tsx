@@ -1,12 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/utils/api";
+
+interface Document {
+  id: number;
+  filename: string;
+  filepath: string;
+  uploaded_at: string;
+}
 
 export default function DocumentsPage() {
   const [files, setFiles] = useState<FileList | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [message, setMessage] = useState<string>("");
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const res = await api.get("/documents");
+      setDocuments(res.data);
+    } catch (error) {
+      console.error("Failed to fetch documents", error);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiles(e.target.files);
@@ -20,10 +41,10 @@ export default function DocumentsPage() {
 
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]); // name MUST match backend
+      formData.append("files", files[i]);
     }
 
-    console.log("Uploading files:", formData.getAll("files"));
+    setStatus("uploading");
 
     try {
       await api.post("/documents/upload", formData, {
@@ -32,6 +53,7 @@ export default function DocumentsPage() {
       setStatus("success");
       setMessage("All files uploaded successfully.");
       setFiles(null);
+      fetchDocuments();
     } catch (error: any) {
       setStatus("error");
       const err = error.response?.data;
@@ -45,10 +67,10 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4 max-w-xl mx-auto">
+    <div className="flex flex-col gap-8 p-6 max-w-4xl mx-auto">
       <h1 className="text-4xl font-bold">Documents</h1>
 
-      <div className="flex flex-col gap-2">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
           accept=".pdf,.docx,.csv"
@@ -58,7 +80,7 @@ export default function DocumentsPage() {
         />
         <button
           disabled={!files || status === "uploading"}
-          onClick={handleSubmit}
+          type="submit"
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
         >
           {status === "uploading" ? "Uploading..." : "Upload"}
@@ -68,6 +90,37 @@ export default function DocumentsPage() {
           <p className={`text-sm ${status === "success" ? "text-green-600" : "text-red-600"}`}>
             {message}
           </p>
+        )}
+      </form>
+
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Your Uploaded Documents</h2>
+        {documents.length === 0 ? (
+          <p className="text-gray-600">No documents uploaded yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {documents.map((doc) => (
+              <li
+                key={doc.id}
+                className="border p-4 rounded-lg shadow-sm flex items-center justify-between bg-white"
+              >
+                <div>
+                  <p className="font-medium">{doc.filename}</p>
+                  <p className="text-sm text-gray-500">
+                    Uploaded: {new Date(doc.uploaded_at).toLocaleString()}
+                  </p>
+                </div>
+                <a
+                  href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.filepath}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  View
+                </a>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>

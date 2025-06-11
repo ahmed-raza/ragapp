@@ -1,5 +1,6 @@
 from langchain_core.messages import BaseMessage
-from typing import TypedDict, Annotated, List
+from langgraph.graph.message import add_messages
+from typing import TypedDict, Annotated, List, Sequence
 import operator
 
 class AgentState(TypedDict):
@@ -9,4 +10,5 @@ class AgentState(TypedDict):
     Attributes:
         messages: A list of messages exchanged in the conversation.
     """
-    messages: Annotated[List[BaseMessage], operator.add]
+    messages: Annotated[Sequence[BaseMessage], add_messages]
+    thread_id: str

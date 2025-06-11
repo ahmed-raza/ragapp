@@ -48,3 +48,4 @@ backend/*/__pycache__
 backend/**/__pycache__
 backend/chroma_db
 backend/docs
+backend/uploads

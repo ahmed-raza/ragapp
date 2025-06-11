@@ -1,14 +1,25 @@
 from langchain.schema import HumanMessage, AIMessage
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from routes import routes
 from database import Base, engine
 from core.security import get_user_from_token
 from database import SessionLocal
-from agent.graph import app as rag_app
+from agent.graph import graph
+from agent.memory import get_checkpointer, get_past_messages
+from agent.store import store
 import asyncio, uuid
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global rag_app
+    global checkpointer
+    checkpointer = await get_checkpointer()
+    rag_app = graph.compile(checkpointer=checkpointer, store=store)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,17 +56,18 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             human_message = HumanMessage(data)
-            cid = str(uuid.uuid4())
             config = {
                 "configurable": {
                     "thread_id": thread_id,
-                    "checkpoint_ns": "default",
-                    "checkpoint_id": cid,
                 }
             }
-            state = {"messages": [human_message]}
+            past_messages = await get_past_messages(checkpointer, config)
+            messages = past_messages + [human_message]
+            cid = str(uuid.uuid4())
+            config["configurable"]["checkpoint_ns"] = "default"
+            config["configurable"]["checkpoint_id"] = cid
             ai_messages = []
-            response = await rag_app.ainvoke(state, config=config)
+            response = await rag_app.ainvoke({"messages": messages, "thread_id": thread_id}, config=config)
 
             for message in response.get("messages"):
                 if isinstance(message, AIMessage) and message.response_metadata["finish_reason"] == "stop":

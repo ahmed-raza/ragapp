@@ -68,6 +68,8 @@ async def websocket_endpoint(websocket: WebSocket):
             for word in all_words:
                 await websocket.send_text(word + " ")
                 await asyncio.sleep(0.08)
+
+            await websocket.send_text("[end]")
     except WebSocketDisconnect as e:
         print(f"Client disconnected {e}")
     except Exception as e:

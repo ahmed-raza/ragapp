@@ -3,12 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_USER = os.getenv("MYSQL_DB_USER")
-DB_PASS = os.getenv("MYSQL_DB_PASS")
-DB_HOST = os.getenv("MYSQL_DB_HOST")
-DB_NAME = os.getenv("MYSQL_DB_NAME")
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASS = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+DB_NAME = os.getenv("POSTGRES_DB")
+SSL_MODE = os.getenv("DATABASE_SSLMODE", "prefer").lower()
 
-SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

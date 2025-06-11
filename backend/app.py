@@ -10,6 +10,8 @@ from agent.graph import graph
 from agent.memory import get_checkpointer, get_past_messages
 from agent.store import store
 import asyncio, uuid
+from models.user import User
+from models.document import Document
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -15,12 +15,12 @@ def should_continue(state: AgentState) -> str:
     #     print("---ENDING PROCESSING---")
     return "end"
 
-workflow = StateGraph(AgentState)
+graph = StateGraph(state_schema=AgentState)
 
-workflow.add_node("process_message", process_message_node)
+graph.add_node("process_message", process_message_node)
 
-workflow.add_edge(START, "process_message")
-workflow.add_conditional_edges(
+graph.add_edge(START, "process_message")
+graph.add_conditional_edges(
     "process_message",
     should_continue,
     {
@@ -28,5 +28,3 @@ workflow.add_conditional_edges(
         "end": END
     }
 )
-
-app = workflow.compile()

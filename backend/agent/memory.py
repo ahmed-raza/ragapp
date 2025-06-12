@@ -44,12 +44,9 @@ async def get_checkpointer():
 
 async def get_past_messages(checkpointer, config):
     thread_id = config["configurable"]["thread_id"]
-    print(f"[get_past_messages] Fetching past messages for thread: {thread_id}")
-    print(f"[get_past_messages] Config: {config}")
     messages = []
     try:
         past_state_tuple = await checkpointer.aget_tuple({"configurable": {"thread_id": thread_id}})
-        print(f"[get_past_messages] Retrieved past state tuple: {past_state_tuple}")
         if not past_state_tuple:
             return []
 

@@ -10,15 +10,23 @@ def process_message_node(state: AgentState) -> AgentState:
     print("---EXECUTING PROCESS MESSAGE NODE---")
 
     system_prompt = """
-        You are an AI assistant responsible for generating reports strictly based on user-uploaded documents. You must follow these rules:
+        You are a document assistant. You must answer ONLY using information found in the user's documents.
+        You are provided with a tool called `use_document_search_tool`. Always use this tool to search for relevant information in the documents — even if you believe you know the answer.
+        Never guess or use prior knowledge. If you cannot find the answer in the documents via this tool, respond that the information is not available in the provided sources.
 
-        1. Never generate or assume any information that is not explicitly found in the documents.
-        2. Always rely on the documents as the sole source of truth. Do not use prior knowledge or outside facts.
-        3. If you need information to answer a question or generate part of a report, call the use_document_search_tool with a precise and well-formed query.
-        4. Combine and summarize the results from the document search to construct your response. If the documents do not contain the needed information, clearly say so.
-        5. Be precise, factual, and grounded in the retrieved data. Do not speculate or fill in gaps.
+        Your job is to:
+        - Search the documents using the tool
+        - Wait for tool output
+        - Generate a response only based on what the tool returns
+        - When it comes to performing calculations, preparing reports or charts or tables basically for whatever reason you need data you must just rely on the documents sources.
+        - You are free to create reports, summaries, tables, or insights etc. However, you must always use the `use_document_search_tool` to gather the necessary data from the user's documents.
 
-        You have access to the use_document_search_tool, which returns content from the user's private document set.
+        If a user asks a question like:
+        "What test did I perform?"
+        "Summarize the report."
+        "Give me insights from my files."
+
+        ALWAYS CALL THE TOOL TO RETRIEVE RELEVANT DATA. NEVER SKIP THE TOOL USAGE.
     """
 
     prompt_template = ChatPromptTemplate.from_messages(
@@ -36,7 +44,7 @@ def process_message_node(state: AgentState) -> AgentState:
     user_id = state["user_id"]
     print(f"---STATE USER ID: {user_id}---")
 
-    response = chain.invoke(messages)
+    response = chain.invoke({"messages": messages})
 
     state["messages"] = state["messages"] + [response]
 

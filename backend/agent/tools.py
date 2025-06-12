@@ -1,6 +1,8 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from .vector_search import DocumentSearchTool
+from langgraph.prebuilt import InjectedState
+from typing import Annotated
+from .vector_search import DocumentSearch
 from config import UPLOAD_DIR
 from .state import AgentState
 
@@ -14,19 +16,30 @@ def get_llm(temperature: float = 0.5):
         )
 
 @tool
-def use_document_search_tool(state: AgentState):
+def use_document_search_tool(query: str, state: Annotated[AgentState, InjectedState]):
     """
     Tool to search user-uploaded documents.
-    This tool takes the current state, extracts the query and user ID,
+    This tool takes the query parameter,
     and performs a search using the DocumentSearchTool.
     """
-    query = state["input"]
     user_id = state["user_id"]
     docs_dir = f"{UPLOAD_DIR}/{user_id}"
 
-    tool = DocumentSearchTool(docs_dir=docs_dir, db_dir=f"./chroma_db/{user_id}")
+    print(f"---SEARCHING DOCUMENTS IN {docs_dir} FOR USER {user_id} WITH QUERY: {query}---")
+
+    tool = DocumentSearch(docs_dir=docs_dir, db_dir=f"./chroma_db/{user_id}")
     results = tool.search(query)
-    return {"search_results": results}
+
+    if not results:
+        print(f"---NO RELEVANT DOCUMENTS FOUND FOR USER {user_id}---")
+        return "No relevant documents found for the query."
+
+    # Format results as a plain string
+    formatted = "\n\n".join([f"Document {i+1}:\n{doc}" for i, doc in enumerate(results)])
+
+    print(f"---FOUND RESULTS FOR USER {user_id}")
+
+    return formatted
 
 tools = [
     use_document_search_tool,

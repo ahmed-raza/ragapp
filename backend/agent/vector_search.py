@@ -1,8 +1,8 @@
 # tools/vector_search.py
 from langchain.tools import Tool
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
 from doc import load_documents_from_folder
 from dotenv import load_dotenv
 from config import UPLOAD_DIR
@@ -10,7 +10,7 @@ import os
 
 load_dotenv()
 
-class DocumentSearchTool:
+class DocumentSearch:
     def __init__(self, docs_dir=UPLOAD_DIR, db_dir="./chroma_db"):
         self.docs_dir = docs_dir
         self.db_dir = db_dir
@@ -36,5 +36,5 @@ class DocumentSearchTool:
 document_search_tool = Tool(
     name="document_search",
     description="Search uploaded documents and return relevant content.",
-    func=lambda q: DocumentSearchTool().search(q)
+    func=lambda q: DocumentSearch().search(q)
 )

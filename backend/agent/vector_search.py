@@ -10,7 +10,7 @@ import os
 
 load_dotenv()
 
-class DocumentSearch:
+class VectorSearch:
     def __init__(self, docs_dir=UPLOAD_DIR, db_dir="./chroma_db"):
         self.docs_dir = docs_dir
         self.db_dir = db_dir
@@ -31,10 +31,9 @@ class DocumentSearch:
         results = self.db.similarity_search(query, k=k)
         return "\n\n".join([doc.page_content for doc in results])
 
-
 # Create a LangChain tool
 document_search_tool = Tool(
     name="document_search",
     description="Search uploaded documents and return relevant content.",
-    func=lambda q: DocumentSearch().search(q)
+    func=lambda q: VectorSearch().search(q)
 )

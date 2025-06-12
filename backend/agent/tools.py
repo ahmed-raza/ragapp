@@ -2,7 +2,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langgraph.prebuilt import InjectedState
 from typing import Annotated
-from .vector_search import DocumentSearch
+from .vector_search import VectorSearch
 from config import UPLOAD_DIR
 from .state import AgentState
 
@@ -20,14 +20,14 @@ def use_document_search_tool(query: str, state: Annotated[AgentState, InjectedSt
     """
     Tool to search user-uploaded documents.
     This tool takes the query parameter,
-    and performs a search using the DocumentSearchTool.
+    and performs a search using the VectorSearch.
     """
     user_id = state["user_id"]
     docs_dir = f"{UPLOAD_DIR}/{user_id}"
 
     print(f"---SEARCHING DOCUMENTS IN {docs_dir} FOR USER {user_id} WITH QUERY: {query}---")
 
-    tool = DocumentSearch(docs_dir=docs_dir, db_dir=f"./chroma_db/{user_id}")
+    tool = VectorSearch(docs_dir=docs_dir, db_dir=f"./chroma_db/{user_id}")
     results = tool.search(query)
 
     if not results:

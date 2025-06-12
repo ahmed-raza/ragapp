@@ -2,24 +2,19 @@
 
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
+import { useAuthGuard } from "@/components/useAuthGuard";
 
 export default function SettingsPage() {
-  const [user, setUser] = useState({});
+  useAuthGuard();
+  const [user, setUser] = useState({username: "", email: ""});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Fetching user settings with token:", token);
     if (!token) return;
 
     api
-      .get("/settings", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get("/settings")
       .then((res) => {
-        console.log("User settings fetched successfully:", res.data);
         setUser(res.data);
       })
       .catch((err) => {

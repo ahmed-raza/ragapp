@@ -1,4 +1,8 @@
+"use client";
+import { useAuthGuard } from "@/components/useAuthGuard";
+
 export default function DashboardPage() {
+  useAuthGuard();
   return (
     <div className="flex">
       <main className="flex-1 p-4">

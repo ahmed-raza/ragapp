@@ -1,8 +1,10 @@
 "use client";
 
+import { useAuthGuard } from "@/components/useAuthGuard";
 import { useState, useRef, useEffect } from "react";
 
 export default function Chat() {
+  useAuthGuard();
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const socket = useRef<WebSocket | null>(null);

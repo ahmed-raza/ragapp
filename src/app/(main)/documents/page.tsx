@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
+import { useAuthGuard } from "@/components/useAuthGuard";
 
 interface Document {
   id: number;
@@ -11,6 +12,7 @@ interface Document {
 }
 
 export default function DocumentsPage() {
+  useAuthGuard();
   const [files, setFiles] = useState<FileList | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");

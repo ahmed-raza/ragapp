@@ -12,3 +12,4 @@ class AgentState(TypedDict):
     """
     messages: Annotated[Sequence[BaseMessage], add_messages]
     thread_id: str
+    user_id: int

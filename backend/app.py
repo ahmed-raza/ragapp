@@ -52,7 +52,8 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=1008)
         return
 
-    thread_id = "thread_" + str(user.id)
+    user_id = user.id
+    thread_id = "thread_" + str(user_id)
     print(f"🔗 WebSocket connected: {thread_id}")
     try:
         while True:
@@ -69,7 +70,7 @@ async def websocket_endpoint(websocket: WebSocket):
             config["configurable"]["checkpoint_ns"] = "default"
             config["configurable"]["checkpoint_id"] = cid
             ai_messages = []
-            response = await rag_app.ainvoke({"messages": messages, "thread_id": thread_id}, config=config)
+            response = await rag_app.ainvoke({"messages": messages, "thread_id": thread_id, "user_id": user_id}, config=config)
 
             for message in response.get("messages"):
                 if isinstance(message, AIMessage) and message.response_metadata["finish_reason"] == "stop":

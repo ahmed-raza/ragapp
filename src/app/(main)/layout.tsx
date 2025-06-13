@@ -1,21 +1,18 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { SessionProvider } from 'next-auth/react';
 import Sidebar from '../../components/sidebar';
+import ProtectedWrapper from '@/components/ProtectedWrapper';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) router.push('/login');
-  }, []);
+export default function MainLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 bg-gray-50">{children}</main>
+      <SessionProvider>
+        <ProtectedWrapper>
+          <Sidebar />
+          <main className="flex-1 bg-gray-50">{children}</main>
+        </ProtectedWrapper>
+      </SessionProvider>
     </div>
   );
 }

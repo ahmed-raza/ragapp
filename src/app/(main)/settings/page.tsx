@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/utils/api";
-import { useAuthGuard } from "@/components/useAuthGuard";
+import { createAPIClient } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 export default function SettingsPage() {
-  useAuthGuard();
-  const [user, setUser] = useState({username: "", email: ""});
+  const { data: session, status } = useSession();
+  const [user, setUser] = useState({ username: "", email: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    const token = session?.accessToken;
+    if (!token) {
+      return;
+    }
+    const api = createAPIClient(token);
 
     api
       .get("/settings")
@@ -20,7 +23,7 @@ export default function SettingsPage() {
       .catch((err) => {
         console.error("Failed to fetch user", err);
       });
-  }, []);
+  }, [session]);
 
   return (
     <main className="max-w-xl mx-auto p-6 bg-white rounded shadow mt-10">

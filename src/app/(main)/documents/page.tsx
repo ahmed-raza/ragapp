@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/utils/api";
-import { useAuthGuard } from "@/components/useAuthGuard";
+import { createAPIClient } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 interface Document {
   id: number;
@@ -12,18 +12,26 @@ interface Document {
 }
 
 export default function DocumentsPage() {
-  useAuthGuard();
+  const { data: session } = useSession();
   const [files, setFiles] = useState<FileList | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    const token = session?.accessToken;
+    if (token) {
+      fetchDocuments(token);
+    }
+  }, [session]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async (token: string | undefined) => {
     try {
+      if (!token) {
+        console.error("No access token found");
+        return;
+      }
+      const api = createAPIClient(token);
       const res = await api.get("/documents");
       setDocuments(res.data);
     } catch (error) {
@@ -49,13 +57,15 @@ export default function DocumentsPage() {
     setStatus("uploading");
 
     try {
+      const token = session?.accessToken;
+      const api = createAPIClient(token);
       await api.post("/documents/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setStatus("success");
       setMessage("All files uploaded successfully.");
       setFiles(null);
-      fetchDocuments();
+      fetchDocuments(token);
     } catch (error: any) {
       setStatus("error");
       const err = error.response?.data;

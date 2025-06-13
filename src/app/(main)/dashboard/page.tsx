@@ -1,15 +1,13 @@
-"use client";
-import { useAuthGuard } from "@/components/useAuthGuard";
+'use client';
+import { useSession } from 'next-auth/react';
 
 export default function DashboardPage() {
-  useAuthGuard();
+  const { data: session, status } = useSession();
+
   return (
-    <div className="flex">
-      <main className="flex-1 p-4">
-        <h1 className="text-4xl font-bold">Dashboard</h1>
-        <p>Welcome to the dashboard!</p>
-        <p>Here you can manage your application settings and view analytics.</p>
-      </main>
+    <div className="flex flex-col p-6 mx-auto">
+      <h1 className="text-4xl font-bold">Dashboard</h1>
+      <p>Welcome, {session?.user?.email}</p>
     </div>
   );
 }

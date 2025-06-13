@@ -1,27 +1,31 @@
 'use client';
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import api from '@/utils/api';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    try {
-      const form = new URLSearchParams();
-      form.append('username', email);
-      form.append('password', password);
+    setLoading(true);
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
 
-      const res = await api.post('/login', form);
-      localStorage.setItem('token', res.data.access_token);
+    setLoading(false);
+
+    if (result?.error) {
+      setError('Invalid credentials');
+    } else {
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Login failed');
     }
   }
 
@@ -49,9 +53,15 @@ export default function LoginPage() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            disabled={loading}
+            className={`w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-lg transition-colors ${
+              loading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-indigo-700'
+            }`}
           >
-            Login
+            {loading && (
+              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">

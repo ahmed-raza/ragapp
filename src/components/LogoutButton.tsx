@@ -1,17 +1,10 @@
-// src/components/LogoutButton.tsx
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 export default function LogoutButton() {
-  const router = useRouter();
-
   const handleLogout = () => {
-    // Remove the JWT token from localStorage
-    localStorage.removeItem('token');
-
-    // Redirect to the login page
-    router.push('/login');
+    signOut({ callbackUrl: '/login' }); // Redirect after logout
   };
 
   return (

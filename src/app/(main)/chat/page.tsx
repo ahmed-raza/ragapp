@@ -1,10 +1,10 @@
 "use client";
 
-import { useAuthGuard } from "@/components/useAuthGuard";
+import { useSession } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 
 export default function Chat() {
-  useAuthGuard();
+  const { data: session, status } = useSession();
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const socket = useRef<WebSocket | null>(null);
@@ -22,7 +22,7 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = session?.accessToken;
     if (!token) return;
 
     const wsUrl = `ws://localhost:8000/ws?token=${encodeURIComponent(token)}`;
@@ -62,7 +62,7 @@ export default function Chat() {
     return () => {
       socket.current?.close();
     };
-  }, []);
+  }, [session]);
 
   // Scroll to bottom every time messages update
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function Chat() {
 
   return (
     <main className="flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-2xl mt-4 flex items-center gap-4 bg-white rounded-t-xl shadow px-4 py-3 border-b border-gray-200">
+      <div className="w-full max-w-4xl mt-4 flex items-center gap-4 bg-white rounded-t-xl shadow px-4 py-3 border-b border-gray-200">
         <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
           🤖
         </div>
@@ -97,6 +97,7 @@ export default function Chat() {
               {isConnected ? "Online" : "Offline"}
               {isTyping && (<> • <span className="animate-pulse">Bot is typing...</span></>)}
               {processing && (<> • <span className="animate-pulse">Processing...</span></>)}
+              {status === "loading" && (<> • <span className="animate-pulse">Connecting...</span></>)}
             </span>
           </div>
         </div>
@@ -104,7 +105,7 @@ export default function Chat() {
 
       <div
         ref={chatContainerRef}
-        className="w-full max-w-2xl h-[77vh] bg-white rounded-b-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4"
+        className="w-full max-w-4xl h-[77vh] bg-white rounded-b-xl shadow p-4 overflow-y-auto mb-4 flex flex-col space-y-4"
       >
         {messages.map((msg, idx) => (
           <div
@@ -120,7 +121,7 @@ export default function Chat() {
         ))}
       </div>
 
-      <form onSubmit={sendMessage} className="w-full max-w-2xl flex gap-2">
+      <form onSubmit={sendMessage} className="w-full max-w-4xl flex gap-2">
         <textarea
           rows={2}
           value={input}

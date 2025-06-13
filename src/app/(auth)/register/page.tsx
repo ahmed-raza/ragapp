@@ -2,20 +2,25 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import api from '@/utils/api';
+import { createAPIClient } from '@/utils/api';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: '', username: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
     try {
+      const api = createAPIClient();
       await api.post('/register', form);
       router.push('/login');
     } catch (err: any) {
       setError(err?.response?.data?.detail || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -51,9 +56,15 @@ export default function RegisterPage() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+            disabled={loading}
+            className={`w-full flex items-center justify-center gap-2 bg-emerald-600 text-white py-2 rounded-lg transition-colors ${
+              loading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-emerald-700'
+            }`}
           >
-            Register
+            {loading && (
+              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">

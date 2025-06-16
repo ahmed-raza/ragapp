@@ -39,6 +39,23 @@ uvicorn main:app --reload
 
 Open [http://localhost:8000/docs](http://localhost:8000/docs) with your browser to see the result.
 
+## OR
+## Dockerize Backend
+
+```bash
+cd backend
+```
+
+Dockerize the app.
+```bash
+docker --debug build -t fastapi-backend .
+```
+
+Run the container.
+```bash
+docker run -d -p 8000:8000 --name ragapp fastapi-backend
+```
+
 ## Frontend
 
 First, run install the required npm packages:

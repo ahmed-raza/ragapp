@@ -1,8 +1,53 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Backend
+Switch directory to `backend`
 
-First, run the development server:
+```bash
+cd backend
+```
+
+Create the virtual env:
+
+```bash
+python3 -m venv venv
+```
+
+Activate venv:
+
+```bash
+source venv/bin/activate
+```
+
+Install the python packages from `requirements.txt`:
+
+```bash
+pip install < requirements.txt
+```
+
+Make sure you have the proper .env file with all the values filled:
+
+```bash
+cp .env.example .env
+```
+
+Run the backend app:
+
+```bash
+uvicorn main:app --reload
+```
+
+Open [http://localhost:8000/docs](http://localhost:8000/docs) with your browser to see the result.
+
+## Frontend
+
+First, run install the required npm packages:
+
+```bash
+npm install
+```
+
+Run the frontend application:
 
 ```bash
 npm run dev
